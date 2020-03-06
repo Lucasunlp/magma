@@ -28,12 +28,18 @@ class Square
 
   def around_square
     around_square = []
-    around_square.push(@world.square_at(self.x - 1, self.y - 1))
-    around_square.push(@world.square_at(self.x - 1, self.y))
-    around_square.push(@world.square_at(self.x - 1, self.y + 1))
-    around_square.push(@world.square_at(self.x + 1, self.y - 1))
-    around_square.push(@world.square_at(self.x + 1, self.y))
-    around_square.push(@world.square_at(self.x + 1, self.y + 1))
+    around_square.push(@world.square_at(x - 1, y - 1))
+    around_square.push(@world.square_at(x - 1, y))
+    around_square.push(@world.square_at(x - 1, y + 1))
+    around_square.push(@world.square_at(x + 1, y - 1))
+    around_square.push(@world.square_at(x + 1, y))
+    around_square.push(@world.square_at(x + 1, y + 1))
     around_square
+  end
+
+  def live_around_square
+    around_square.select do |square|
+      square && square&.live?
+    end
   end
 end
