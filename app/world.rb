@@ -1,14 +1,24 @@
-require './app/square'
 class World
-  def initialize(width, height)
+  attr_accessor :rows, :cols, :square_board, :squares
+  def initialize(rows=3, cols=3)
+    @rows = rows
+    @cols = cols
     @squares = []
-    # Creating matrix with my params
-    height.times do |x_axis|
-      @squares.push([])
-      width.times do |y_axis|
-        @squares[x_axis].push(Square.new(self, x_axis, y_axis))
+
+    @square_board = Array.new(rows) do |row|
+      Array.new(cols) do |col|
+        Square.new(col, row) # Note: col is 1st
       end
     end
+
+    square_board.each do |row|
+      row.each do |element|
+        if element.is_a?(Square)
+          squares << element
+        end
+      end
+    end
+
   end
 
   def squares
@@ -16,31 +26,62 @@ class World
     @squares.flatten
   end
 
-  def square_at(x_axis, y_axis)
-    # If exist a square apply the params
-    @squares[x_axis][y_axis] if @squares[x_axis]
+  def live_squares
+    squares.select(&:live?)
   end
 
-  def play
-    next_round_live_squares = []
-    next_round_dead_squares = []
+  def dead_squares
+    squares.select(&:dead?)
+  end
 
-    @world.squares.each do |square|
-      neighbour_count = world.live_around_square(square).count
-      # Rule 1:
-      # Any living cell with fewer than two live neighbours dies, as if caused by underpopulation.
-      next_round_dead_squares << square if square.live? && neighbour_count < 2
-      # Rule 2:
-      # Any living cell with two or three live neighbours lives on to the next generation.
-      next_round_dead_squares << square if square.live? && neighbour_count > 3
-      # Rule 3:
-      # Any living cell with more than three live neighbours dies, as if by overcrowding
-      if square.live? && ([2, 3].include? neighbour_count)
-        next_round_live_squares << square
-      end
-      # Rule 4:
-      # Any dead cell with exactly three live neighbours becomes a live cell.
-      next_round_live_squares << square if square.dead? && neighbour_count == 3
+  def randomly_populate
+    squares.each do |_square|
+      square = [true, false].sample
     end
   end
+
+  def live_around_square(square)
+    live_neighbours = []
+    # Neighbour to the North-East
+    if (square.y_axis > 0) && (square.x_axis < (cols - 1))
+      candidate = @squares[square.y_axis - 1][square.x_axis + 1]
+      live_neighbours << candidate if candidate.live?
+    end
+    # Neighbour to the South-East
+    if (square.y_axis < (rows - 1)) && (square.x_axis < (cols - 1))
+      candidate = @squares[square.y_axis + 1][square.x + 1]
+      live_neighbours << candidate if candidate.live?
+    end
+    # Neighbours to the South-West
+    if (square.y_axis < (rows - 1)) && (square.x_axis > 0)
+      candidate = @squares[square.y_axis + 1][square.x_axis - 1]
+      live_neighbours << candidate if candidate.live?
+    end
+    # Neighbours to the North-West
+    if (square.y_axis > 0) && (square.x_axis > 0)
+      candidate = @squares[square.y_axis - 1][square.x_axis - 1]
+      live_neighbours << candidate if candidate.live?
+    end
+    # Neighbour to the North
+    if square.y_axis > 0
+      candidate = @squares[square.y_axis - 1][square.x_axis]
+      live_neighbours << candidate if candidate.live?
+    end
+    # Neighbour to the East
+    if square.x_axis < (cols - 1)
+      candidate = @squares[square.y_axis][square.x_axis + 1]
+      live_neighbours << candidate if candidate.live
+    end
+    # Neighbour to the South
+    if square.y_axis < (rows - 1)
+      candidate = @squares[cell.y_axis + 1][cell.x_axis]
+      live_neighbours << candidate if candidate.live
+    end
+    # Neighbours to the West
+    if cell.x_axis > 0
+      candidate = @squares[cell.y_axis][cell.x_axis - 1]
+      live_neighbours << candidate if candidate.live
+    end
+    live_neighbours
+ end
 end

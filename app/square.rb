@@ -1,10 +1,11 @@
 class Square
-  def initialize(world, x_axis, y_axis)
-    @world = world
-    @x_axis = x_axis
-    @y_axis = y_axis
-    @live = false
-  end
+  attr_accessor :x, :y, :live
+
+   def initialize(x=0, y=0)
+     @x_axis = x
+     @y_axis = y
+     @live = false
+   end
 
   def dead?
     !@live
@@ -28,12 +29,12 @@ class Square
 
   def around_square
     around_square = []
-    around_square.push(@world.square_at(x - 1, y - 1))
-    around_square.push(@world.square_at(x - 1, y))
-    around_square.push(@world.square_at(x - 1, y + 1))
-    around_square.push(@world.square_at(x + 1, y - 1))
-    around_square.push(@world.square_at(x + 1, y))
-    around_square.push(@world.square_at(x + 1, y + 1))
+    around_square.push(@world.square_board(@x_axis - 1, @y_axis - 1))
+    around_square.push(@world.square_board(@x_axis - 1, @y_axis))
+    around_square.push(@world.square_board(@x_axis - 1, @y_axis + 1))
+    around_square.push(@world.square_board(@x_axis + 1, @y_axis - 1))
+    around_square.push(@world.square_board(@x_axis + 1, @y_axis))
+    around_square.push(@world.square_board(@x_axis + 1, @y_axis + 1))
     around_square
   end
 
